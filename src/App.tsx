@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import { ChevronDown } from 'lucide-react'
+import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -26,6 +26,10 @@ import {
   FormLabel,
   FormMessage
 } from './components/form'
+import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './components/command'
+import { Button } from './components/button'
+import { cn } from './components/utils'
 
 const REQUIRED_MESSAGE = "Та энэ хүснэгтийг заавал бөглөнө үү!"
 const MUST_BE_NUMBER = "Та тоон утга оруулна уу!"
@@ -132,7 +136,71 @@ export default function App() {
               <h1 className='text-2xl md:text-3xl col-span-2 font-bold mb-6'>
                 {'Бөглөх талбар'}
               </h1>
-              <Selector name='company' label={'Компани'} constant={COMPANY_NAMES} />
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>{'Компани'}</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            size='sm'
+                            className={cn(
+                              "bg-transparent border-input hover:bg-transparent hover:text-muted-foreground justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? COMPANY_NAMES.find(
+                                (company) => company === field.value
+                              )
+                              : "Сонгох"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[300px] border-input p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Компани хайх..."
+                            className="h-9"
+                          />
+                          <CommandList>
+                            <CommandEmpty>{'Компани олдсонгүй.'}</CommandEmpty>
+                            <CommandGroup>
+                              {COMPANY_NAMES.map((company: string) => (
+                                <CommandItem
+                                  value={company}
+                                  key={company}
+                                  className='hover:bg-orange-400'
+                                  onSelect={() => {
+                                    form.setValue("company", company as any)
+                                  }}
+                                >
+                                  {company}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      company === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="model"
@@ -278,9 +346,9 @@ export default function App() {
                   </FormItem>
                 )}
               />
-              <button type='submit' className='col-span-2 p-2 bg-red-400 hover:bg-red-500 rounded-xl text-white shadow-lg cursor-pointer transition-all duration-200'>
+              <Button type='submit' className='col-span-2 bg-red-400 hover:bg-red-500 text-white cursor-pointer transition-all duration-200'>
                 {'Илгээх'}
-              </button>
+              </Button>
             </form>
           </Form>
         </div>
