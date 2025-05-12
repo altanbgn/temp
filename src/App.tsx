@@ -28,6 +28,7 @@ import {
 } from './components/form'
 
 const REQUIRED_MESSAGE = "Та энэ хүснэгтийг заавал бөглөнө үү!"
+const MUST_BE_NUMBER = "Та тоон утга оруулна уу!"
 
 const formInputsSchema = z.object({
   plate_number_condition: z
@@ -35,30 +36,26 @@ const formInputsSchema = z.object({
   type: z
     .enum(TYPE, { required_error: REQUIRED_MESSAGE }),
   door: z
-    .enum(['2', '3', '4', '5', '6'], {
-      required_error: REQUIRED_MESSAGE,
-      invalid_type_error: "Зөвхөн [2, 3, 4, 5, 6] гэсэн утгуудаас өгнө үү",
-      errorMap: () => { return { message: "Зөвхөн [2, 3, 4, 5, 6] гэсэн утгуудаас өгнө үү" } }
-    }),
+    .enum(['2', '3', '4', '5', '6'], { required_error: REQUIRED_MESSAGE }),
   steering_wheel_side: z
     .enum(STEERING_WHEEL_SIDE, { required_error: REQUIRED_MESSAGE }),
   drivetrain: z
     .enum(DRIVE_TRAIN, { required_error: REQUIRED_MESSAGE }),
   manufactured_year: z
     .coerce
-    .number({ required_error: REQUIRED_MESSAGE })
+    .number({ required_error: REQUIRED_MESSAGE, invalid_type_error: MUST_BE_NUMBER })
     .gte(1900, { message: 'Утга 1900 ээс их байх ёстой' })
     .lte(2100, { message: 'Утга 2100 аас бага байх ёстой' }),
   imported_year: z
     .coerce
-    .number({ required_error: REQUIRED_MESSAGE })
+    .number({ required_error: REQUIRED_MESSAGE, invalid_type_error: MUST_BE_NUMBER })
     .gte(1900, { message: 'Утга 1900 ээс их байх ёстой' })
     .lte(2100, { message: 'Утга 2100 аас бага байх ёстой' }),
   engine_type: z
     .enum(ENGINE_TYPE, { required_error: REQUIRED_MESSAGE }),
   motor_capacity: z
     .coerce
-    .number({ required_error: REQUIRED_MESSAGE }),
+    .number({ required_error: REQUIRED_MESSAGE, invalid_type_error: MUST_BE_NUMBER }),
   gear: z
     .enum(GEAR, { required_error: REQUIRED_MESSAGE }),
   color: z
@@ -67,7 +64,7 @@ const formInputsSchema = z.object({
     .enum(COLOR_INSIDE, { required_error: REQUIRED_MESSAGE }),
   km_age: z
     .coerce
-    .number({ required_error: REQUIRED_MESSAGE }),
+    .number({ required_error: REQUIRED_MESSAGE, invalid_type_error: MUST_BE_NUMBER }),
   model: z
     .string({ required_error: REQUIRED_MESSAGE }),
   company: z
