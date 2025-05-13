@@ -134,7 +134,7 @@ export default function App() {
           </div>
         </a>
       </div>
-      <div className='h-svh w-full grid grid-cols-1 md:grid-cols-2 items-between mt-16' id='form'>
+      <div className='h-svh w-full grid grid-cols-1 md:grid-cols-2 items-between gap-3 mt-16' id='form'>
         <div className='flex justify-center items-center'>
           <Form {...form}>
             <form
@@ -405,8 +405,13 @@ export default function App() {
             </form>
           </Form>
         </div>
-        <div className='max-h-full min-h-svh md:auto bg-orange-300 rounded-full flex justify-center items-center p-8 md:p-0' id='result'>
-          <div className='flex flex-col justify-center items-center gap-4'>
+        <div className='h-svh md:auto flex justify-center items-center relative overflow-hidden' id='result'>
+          <div className='w-[100px] h-[100px] absolute top-10 left-20 pointer-events-none -z-10 bg-orange-100 rounded-full' />
+          <div className='w-[250px] h-[250px] absolute left-30 pointer-events-none -z-10 bg-orange-200 rounded-full' />
+          <div className='w-[400px] h-[400px] absolute right-30 pointer-events-none -z-10 bg-orange-200 rounded-full' />
+          <div className='w-[300px] h-[300px] absolute top-10 pointer-events-none -z-10 bg-orange-100 rounded-full' />
+          <div className='w-[300px] h-[300px] absolute bottom-10 left-50 pointer-events-none -z-10 bg-orange-100 rounded-full' />
+          <div className='flex flex-col justify-center items-center gap-4 bg-orange-300 w-[400px] h-[400px] rounded-full'>
             <p className='text-white font-bold'>{'Тооцоолсон үнэ:'}</p>
             <p className='text-6xl md:text-6xl text-white font-black'>{value.toLocaleString() + '₮'}</p>
             {error && <span className='bg-amber-200 rounded-full px-4 py-1'>{error}</span>}
