@@ -140,7 +140,7 @@ export default function App() {
                 control={form.control}
                 name="company"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem className="flex flex-col col-span-2">
                     <FormLabel>{'Компани'}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -205,7 +205,7 @@ export default function App() {
                 control={form.control}
                 name="model"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='col-span-2'>
                     <FormLabel>{'Модел'}</FormLabel>
                     <FormControl>
                       <Input
@@ -260,19 +260,6 @@ export default function App() {
               />
               <FormField
                 control={form.control}
-                name="door"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{'Хаалга'}</FormLabel>
-                    <FormControl>
-                      <Input {...field} required />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="manufactured_year"
                 render={({ field }) => (
                   <FormItem>
@@ -311,6 +298,19 @@ export default function App() {
               />
               <FormField
                 control={form.control}
+                name="door"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{'Хаалга'}</FormLabel>
+                    <FormControl>
+                      <Input placeholder='5' {...field} required />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="km_age"
                 render={({ field }) => (
                   <FormItem>
@@ -331,8 +331,8 @@ export default function App() {
                 control={form.control}
                 name="motor_capacity"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{'Мотор багтаамж'}</FormLabel>
+                  <FormItem className='col-span-2'>
+                    <FormLabel>{'Мотор багтаамж (Л)'}</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
