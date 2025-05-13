@@ -3,13 +3,14 @@ import axios from 'axios'
 import { Check, ChevronDown, ChevronsUpDown } from 'lucide-react'
 import z from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
 
 import { Input } from './components/input'
 import { Selector } from './components/form-selector'
 import {
   COLOR,
   COLOR_INSIDE,
-  COMPANY_NAMES,
+  COMPANY_MODEL_NAMES,
   DRIVE_TRAIN,
   ENGINE_TYPE,
   GEAR,
@@ -17,7 +18,6 @@ import {
   STEERING_WHEEL_SIDE,
   TYPE
 } from './constants'
-import { useForm } from 'react-hook-form'
 import {
   Form,
   FormControl,
@@ -27,7 +27,14 @@ import {
   FormMessage
 } from './components/form'
 import { Popover, PopoverContent, PopoverTrigger } from './components/popover'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './components/command'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList
+} from './components/command'
 import { Button } from './components/button'
 import { cn } from './components/utils'
 
@@ -35,12 +42,17 @@ const REQUIRED_MESSAGE = "Та энэ хүснэгтийг заавал бөгл
 const MUST_BE_NUMBER = "Та тоон утга оруулна уу!"
 
 const formInputsSchema = z.object({
+  company: z
+    .string({ required_error: REQUIRED_MESSAGE }),
+  model: z
+    .string({ required_error: REQUIRED_MESSAGE }),
   plate_number_condition: z
     .enum(PLATE_NUMBER_CONDITION, { required_error: REQUIRED_MESSAGE }),
   type: z
     .enum(TYPE, { required_error: REQUIRED_MESSAGE }),
   door: z
-    .enum(['2', '3', '4', '5', '6'], { required_error: REQUIRED_MESSAGE }),
+    .coerce
+    .number({ required_error: REQUIRED_MESSAGE }),
   steering_wheel_side: z
     .enum(STEERING_WHEEL_SIDE, { required_error: REQUIRED_MESSAGE }),
   drivetrain: z
@@ -69,10 +81,6 @@ const formInputsSchema = z.object({
   km_age: z
     .coerce
     .number({ required_error: REQUIRED_MESSAGE, invalid_type_error: MUST_BE_NUMBER }),
-  model: z
-    .string({ required_error: REQUIRED_MESSAGE }),
-  company: z
-    .enum(COMPANY_NAMES, { required_error: REQUIRED_MESSAGE })
 })
 
 type FormInputs = z.infer<typeof formInputsSchema>
@@ -81,17 +89,15 @@ export default function App() {
   const form = useForm({
     resolver: zodResolver(formInputsSchema),
     mode: 'onBlur',
-
   })
 
   const [value, setValue] = React.useState<number>(0)
   const [error, setError] = React.useState<string | null>('')
 
+  const [selectedCompanyModels, setSelectedCompanyModels] = React.useState<any>([])
+
   const handleSubmit = (values: FormInputs) => {
-    axios.post(import.meta.env.VITE_API_URL + '/car/predict', {
-      ...values,
-      door: parseInt(values.door)
-    })
+    axios.post(import.meta.env.VITE_API_URL + '/car/predict', values)
       .then((res) => {
         setValue(res.data?.price)
         setError(null)
@@ -155,9 +161,9 @@ export default function App() {
                             )}
                           >
                             {field.value
-                              ? COMPANY_NAMES.find(
-                                (company) => company === field.value
-                              )
+                              ? COMPANY_MODEL_NAMES.find(
+                                (item: any) => item.company === field.value
+                              )?.company
                               : "Сонгох"}
                             <ChevronsUpDown className="opacity-50" />
                           </Button>
@@ -172,20 +178,22 @@ export default function App() {
                           <CommandList>
                             <CommandEmpty>{'Компани олдсонгүй.'}</CommandEmpty>
                             <CommandGroup>
-                              {COMPANY_NAMES.map((company: string) => (
+                              {COMPANY_MODEL_NAMES.map((item: any) => (
                                 <CommandItem
-                                  value={company}
-                                  key={company}
+                                  value={item.company}
+                                  key={item.company}
                                   className='hover:bg-orange-400'
                                   onSelect={() => {
-                                    form.setValue("company", company as any)
+                                    form.setValue("company", item.company as any)
+                                    form.setValue("model", '')
+                                    setSelectedCompanyModels(item.models)
                                   }}
                                 >
-                                  {company}
+                                  {item.company}
                                   <Check
                                     className={cn(
                                       "ml-auto",
-                                      company === field.value
+                                      item.company === field.value
                                         ? "opacity-100"
                                         : "opacity-0"
                                     )}
@@ -205,15 +213,58 @@ export default function App() {
                 control={form.control}
                 name="model"
                 render={({ field }) => (
-                  <FormItem className='col-span-2'>
+                  <FormItem className="flex flex-col col-span-2">
                     <FormLabel>{'Модел'}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Prius 20 | Crown гэх мэт'
-                        {...field}
-                        required
-                      />
-                    </FormControl>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            size='sm'
+                            className={cn(
+                              "bg-transparent border-input hover:bg-transparent hover:text-muted-foreground justify-between",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value
+                              ? (selectedCompanyModels || []).find((item: any) => item === field.value)
+                              : "Сонгох"}
+                            <ChevronsUpDown className="opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[300px] border-input p-0">
+                        <Command>
+                          <CommandInput
+                            placeholder="Модел хайх..."
+                            className="h-9"
+                          />
+                          <CommandList>
+                            <CommandEmpty>{'Модел олдсонгүй.'}</CommandEmpty>
+                            <CommandGroup>
+                              {(selectedCompanyModels || []).map((item: any) => (
+                                <CommandItem
+                                  value={item}
+                                  key={item}
+                                  onSelect={() => form.setValue("model", item as any)}
+                                >
+                                  {item}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      item === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -346,14 +397,14 @@ export default function App() {
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='col-span-2 bg-red-400 hover:bg-red-500 text-white cursor-pointer transition-all duration-200'>
+              <Button type='submit' className='col-span-2 bg-orange-300 hover:bg-orange-400 text-white cursor-pointer transition-all duration-200'>
                 {'Илгээх'}
               </Button>
             </form>
           </Form>
         </div>
-        <div className='max-h-full min-h-svh md:auto bg-red-400 md:rounded-tl-full md:rounded-bl-full flex justify-center items-center p-8 md:p-0' id='result'>
-          <div className='w-[500px] flex flex-col gap-4'>
+        <div className='max-h-full min-h-svh md:auto bg-orange-300 rounded-full flex justify-center items-center p-8 md:p-0' id='result'>
+          <div className='flex flex-col justify-center items-center gap-4'>
             <p className='text-white font-bold'>{'Тооцоолсон үнэ:'}</p>
             <p className='text-6xl md:text-6xl text-white font-black'>{value.toLocaleString() + '₮'}</p>
             {error && <span className='bg-amber-200 rounded-full px-4 py-1'>{error}</span>}
