@@ -52,7 +52,9 @@ const formInputsSchema = z.object({
     .enum(TYPE, { required_error: REQUIRED_MESSAGE }),
   door: z
     .coerce
-    .number({ required_error: REQUIRED_MESSAGE }),
+    .number({ required_error: REQUIRED_MESSAGE })
+    .gte(2, { message: "2-оос 6-ын хооронд утга оруулна уу!" })
+    .lte(6, { message: "2-оос 6-ын хооронд утга оруулна уу!" }),
   steering_wheel_side: z
     .enum(STEERING_WHEEL_SIDE, { required_error: REQUIRED_MESSAGE }),
   drivetrain: z
@@ -169,7 +171,7 @@ export default function App() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[300px] border-input p-0">
+                      <PopoverContent className="w-[300px] border-input p-0" align='start'>
                         <Command>
                           <CommandInput
                             placeholder="Компани хайх..."
@@ -234,7 +236,7 @@ export default function App() {
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[300px] border-input p-0">
+                      <PopoverContent className="w-[300px] border-input p-0" align='start'>
                         <Command>
                           <CommandInput
                             placeholder="Модел хайх..."
