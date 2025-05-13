@@ -356,7 +356,7 @@ export default function App() {
                   <FormItem>
                     <FormLabel>{'Хаалга'}</FormLabel>
                     <FormControl>
-                      <Input placeholder='5' {...field} required />
+                      <Input type='number' placeholder='5' {...field} required />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
